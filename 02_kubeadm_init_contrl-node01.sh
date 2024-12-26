@@ -8,12 +8,16 @@ trap 'echo "Error occurred! Exiting."; exit 1' ERR
 PRIVATE_IP=$(hostname -I | awk '{print $1}')
 echo "Private IP address detected: $PRIVATE_IP"
 
+# Set the control plane domain name to a fixed value
+CONTROL_PLANE_DNS="controlplane.k8s.internal" # Change this value based on your design.
+echo "Using fixed control plane DNS name: $CONTROL_PLANE_DNS"
+
 # File to save the output of kubeadm init
 KUBEADM_OUTPUT="/tmp/kubeadm_init_output.txt"
 
 # Initialize the Kubernetes cluster and save the output
 echo "Initializing Kubernetes cluster..."
-sudo kubeadm init --control-plane-endpoint=$PRIVATE_IP --pod-network-cidr=172.0.0.0/16 --upload-certs --ignore-preflight-errors=all | tee $KUBEADM_OUTPUT
+sudo kubeadm init --control-plane-endpoint=$CONTROL_PLANE_DNS --pod-network-cidr=172.0.0.0/16 --upload-certs --ignore-preflight-errors=all | tee $KUBEADM_OUTPUT
 sleep 10
 
 # Configure kubectl for the current user
