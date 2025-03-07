@@ -14,7 +14,7 @@ sleep 10
 # Install containerd
 echo "Installing containerd"
 sudo sysctl --system
-wget https://github.com/containerd/containerd/releases/download/v2.0.0/containerd-2.0.0-linux-amd64.tar.gz -P /tmp
+wget https://github.com/containerd/containerd/releases/download/v2.0.3/containerd-2.0.3-linux-amd64.tar.gz -P /tmp
 cd /tmp
 sudo tar Cxzvf /usr/local containerd-2.0.0-linux-amd64.tar.gz
 
