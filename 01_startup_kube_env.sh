@@ -16,18 +16,18 @@ echo "Installing containerd"
 sudo sysctl --system
 wget https://github.com/containerd/containerd/releases/download/v2.0.3/containerd-2.0.3-linux-amd64.tar.gz -P /tmp
 cd /tmp
-sudo tar Cxzvf /usr/local containerd-2.0.0-linux-amd64.tar.gz
+sudo tar Cxzvf /usr/local containerd-2.0.3-linux-amd64.tar.gz
 
 # Install runc
 echo "Installing runc"
-wget https://github.com/opencontainers/runc/releases/download/v1.2.2/runc.amd64 -P /tmp
+wget https://github.com/opencontainers/runc/releases/download/v1.2.5/runc.amd64 -P /tmp
 sudo install -m 755 runc.amd64 /usr/local/sbin/runc
 
 # Install CNI plugins
 echo "Installing CNI plugins"
 sudo mkdir -p /opt/cni/bin
-wget https://github.com/containernetworking/plugins/releases/download/v1.6.1/cni-plugins-linux-amd64-v1.6.1.tgz -P /tmp
-sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.6.1.tgz
+wget https://github.com/containernetworking/plugins/releases/download/v1.6.2/cni-plugins-linux-amd64-v1.6.2.tgz -P /tmp
+sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.6.2.tgz
 
 # Configure containerd
 echo "Configuring containerd"
