@@ -17,7 +17,7 @@ KUBEADM_OUTPUT="/tmp/kubeadm_init_output.txt"
 
 # Initialize the Kubernetes cluster and save the output
 echo "Initializing Kubernetes cluster..."
-sudo kubeadm init --control-plane-endpoint=$CONTROL_PLANE_DNS --pod-network-cidr=172.0.0.0/16 --upload-certs --ignore-preflight-errors=all | tee $KUBEADM_OUTPUT
+sudo kubeadm init --control-plane-endpoint=$CONTROL_PLANE_DNS --pod-network-cidr=192.168.0.0/16 --upload-certs --ignore-preflight-errors=all | tee $KUBEADM_OUTPUT
 sleep 10
 
 # Configure kubectl for the current user
@@ -26,12 +26,19 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # Install Calico as the Pod network add-on
-kubectl apply --server-side -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
-wget https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml || { echo "Failed to download custom-resources.yaml"; exit 1; }
+kubectl apply --server-side -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/tigera-operator.yaml
+wget https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/custom-resources.yaml || { echo "Failed to download custom-resources.yaml"; exit 1; }
 
 # Update CIDR in custom-resources.yaml
-sed -i 's|192.168.0.0/16|172.0.0.0/16|g' custom-resources.yaml
-echo "Updated CIDR in custom-resources.yaml to 172.0.0.0/16"
+# Ensure encapsulation is set to VXLAN in custom-resources.yaml
+if grep -q 'encapsulation:' custom-resources.yaml; then
+  sed -i 's|encapsulation:.*|encapsulation: VXLAN|' custom-resources.yaml
+  echo "Updated encapsulation to VXLAN in custom-resources.yaml"
+else
+  # If the encapsulation line doesn't exist, insert it under cidr line
+  sed -i '/cidr: 192.168.0.0\/16/a\      encapsulation: VXLAN' custom-resources.yaml
+  echo "Inserted encapsulation: VXLAN in custom-resources.yaml"
+fi
 
 # Apply custom resources
 kubectl apply -f custom-resources.yaml
